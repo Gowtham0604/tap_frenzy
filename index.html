@@ -1,262 +1,105 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<style>
-*{margin:0;padding:0;box-sizing:border-box;user-select:none;-webkit-user-select:none;}
-body{font-family:var(--font-sans,system-ui);background:transparent;overflow:hidden;touch-action:manipulation;}
-#game{width:100%;height:580px;position:relative;overflow:hidden;border-radius:var(--border-radius-lg,12px);border:0.5px solid var(--color-border-tertiary);}
-#arena{width:100%;height:100%;position:relative;background:var(--color-background-primary);}
-#hud{position:absolute;top:0;left:0;right:0;padding:14px 18px;display:flex;justify-content:space-between;align-items:center;background:var(--color-background-primary);border-bottom:0.5px solid var(--color-border-tertiary);z-index:10;}
-.stat{display:flex;flex-direction:column;align-items:center;gap:2px;}
-.stat-label{font-size:11px;color:var(--color-text-tertiary);letter-spacing:0.5px;text-transform:uppercase;}
-.stat-val{font-size:20px;font-weight:500;color:var(--color-text-primary);}
-#timer-bar{position:absolute;bottom:0;left:0;height:3px;background:#7F77DD;transition:width 0.1s linear;z-index:10;}
-#target-area{position:absolute;top:54px;left:0;right:0;bottom:0;}
-.target{position:absolute;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:500;cursor:pointer;transition:transform 0.1s;will-change:transform,opacity;}
-.target:active{transform:scale(0.88)!important;}
-.target.pop{animation:pop 0.18s ease-out forwards;}
-.target.miss-anim{animation:miss 0.22s ease-out forwards;}
-@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.25)}100%{transform:scale(0);opacity:0}}
-@keyframes miss{0%{transform:scale(1)}100%{transform:scale(1.4);opacity:0}}
-.combo-text{position:absolute;font-size:15px;font-weight:500;pointer-events:none;animation:floatUp 0.7s ease-out forwards;z-index:20;}
-@keyframes floatUp{0%{opacity:1;transform:translateY(0)}100%{opacity:0;transform:translateY(-50px)}}
-.ripple{position:absolute;border-radius:50%;pointer-events:none;animation:rippleAnim 0.4s ease-out forwards;}
-@keyframes rippleAnim{0%{transform:scale(0.5);opacity:0.7}100%{transform:scale(2.5);opacity:0}}
-#screen{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;background:var(--color-background-primary);z-index:30;}
-#screen h2{font-size:26px;font-weight:500;color:var(--color-text-primary);}
-#screen p{font-size:14px;color:var(--color-text-secondary);text-align:center;max-width:280px;line-height:1.6;}
-#screen button{padding:12px 32px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:15px;cursor:pointer;font-family:var(--font-sans);}
-#screen button:hover{background:var(--color-background-tertiary);}
-#combo-bar-wrap{position:absolute;left:18px;right:18px;bottom:8px;height:4px;background:var(--color-background-secondary);border-radius:2px;z-index:10;}
-#combo-bar{height:100%;border-radius:2px;background:#7F77DD;width:0%;transition:width 0.1s;}
-.score-row{display:flex;justify-content:space-between;width:100%;max-width:260px;font-size:13px;color:var(--color-text-secondary);}
-.score-row span:last-child{color:var(--color-text-primary);font-weight:500;}
-#leaderboard{width:100%;max-width:300px;border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;}
-.lb-row{display:flex;align-items:center;gap:10px;padding:8px 14px;font-size:13px;border-bottom:0.5px solid var(--color-border-tertiary);}
-.lb-row:last-child{border-bottom:none;}
-.lb-row.me{background:var(--color-background-secondary);}
-.lb-rank{font-size:13px;font-weight:500;width:20px;color:var(--color-text-secondary);}
-.lb-name{flex:1;color:var(--color-text-primary);}
-.lb-score{font-weight:500;color:#7F77DD;}
-#name-input{padding:10px 14px;border-radius:var(--border-radius-md);border:0.5px solid var(--color-border-secondary);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:14px;font-family:var(--font-sans);width:200px;outline:none;}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tap Frenzy | Neon Edition</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<div id="game">
-  <div id="arena">
-    <div id="hud">
-      <div class="stat"><span class="stat-label">Score</span><span class="stat-val" id="score-disp">0</span></div>
-      <div class="stat"><span class="stat-label">Combo</span><span class="stat-val" id="combo-disp">x1</span></div>
-      <div class="stat"><span class="stat-label">Best</span><span class="stat-val" id="best-disp">0</span></div>
-      <div class="stat"><span class="stat-label">Misses</span><span class="stat-val" id="misses-disp">0/3</span></div>
-      <div id="timer-bar" style="width:100%"></div>
+    <div id="game-container">
+        <!-- Background Elements -->
+        <div class="bg-glow"></div>
+        <div class="grid-overlay"></div>
+
+        <!-- HUD -->
+        <div id="hud">
+            <div class="stat-group">
+                <span class="stat-label">SCORE</span>
+                <span id="score" class="stat-value">0</span>
+            </div>
+            <div class="stat-group center">
+                <span id="combo-badge" class="badge">x1</span>
+                <div class="combo-container">
+                    <div id="combo-bar"></div>
+                </div>
+            </div>
+            <div class="stat-group right">
+                <span class="stat-label">LIVES</span>
+                <div id="lives-container" class="lives">
+                    <div class="life active"></div>
+                    <div class="life active"></div>
+                    <div class="life active"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Arena -->
+        <div id="arena"></div>
+
+        <!-- Screens -->
+        <div id="screen-overlay" class="overlay visible">
+            <!-- Start Screen -->
+            <div id="start-screen" class="screen">
+                <h1 class="glitch-text" data-text="TAP FRENZY">TAP FRENZY</h1>
+                <p class="subtitle">NEON EDITION</p>
+                
+                <div class="instructions">
+                    <div class="instruction-item">
+                        <span class="icon standard"></span>
+                        <span>Tap circles before they vanish</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="icon gold"></span>
+                        <span>Golden ones give bonus points</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="icon bomb"></span>
+                        <span>Avoid the red bombs!</span>
+                    </div>
+                </div>
+
+                <div class="input-wrapper">
+                    <input type="text" id="player-name" placeholder="ENTER INITIALS" maxlength="3">
+                </div>
+
+                <button id="start-btn" class="primary-btn">INITIALIZE SEQUENCE</button>
+                
+                <div class="high-score-hint">
+                    BEST: <span id="best-score">0</span>
+                </div>
+            </div>
+
+            <!-- Game Over Screen -->
+            <div id="game-over-screen" class="screen hidden">
+                <h2 class="game-over-title">SEQUENCE TERMINATED</h2>
+                
+                <div class="final-stats">
+                    <div class="final-stat">
+                        <span class="label">FINAL SCORE</span>
+                        <span id="final-score" class="value">0</span>
+                    </div>
+                    <div class="final-stat">
+                        <span class="label">MAX COMBO</span>
+                        <span id="max-combo" class="value">x1</span>
+                    </div>
+                </div>
+
+                <div id="leaderboard">
+                    <h3>ELITE OPERATORS</h3>
+                    <div id="leaderboard-list">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <button id="restart-btn" class="primary-btn">REBOOT SYSTEM</button>
+            </div>
+        </div>
     </div>
-    <div id="target-area"></div>
-    <div id="combo-bar-wrap"><div id="combo-bar"></div></div>
-  </div>
-  <div id="screen">
-    <h2>Tap Frenzy</h2>
-    <p>Tap circles before they vanish. Miss 3 and it's over. Chain hits for combos!</p>
-    <input id="name-input" type="text" placeholder="Your name (optional)" maxlength="16" autocomplete="off" />
-    <button onclick="startGame()">Tap to Start</button>
-  </div>
-</div>
 
-<script>
-const COLORS = [
-  {bg:'#EEEDFE',border:'#7F77DD',text:'#3C3489'},
-  {bg:'#E1F5EE',border:'#1D9E75',text:'#085041'},
-  {bg:'#FAECE7',border:'#D85A30',text:'#712B13'},
-  {bg:'#FBEAF0',border:'#D4537E',text:'#72243E'},
-  {bg:'#E6F1FB',border:'#378ADD',text:'#0C447C'},
-  {bg:'#FAEEDA',border:'#BA7517',text:'#633806'},
-];
-
-let score=0,combo=1,misses=0,best=0,running=false;
-let targets=[],timers=[],spawnTimer,comboTimer,comboDecay;
-let playerName='';
-const leaderboard=JSON.parse(localStorage.getItem('tf_lb')||'[]');
-
-const scoreDisp=document.getElementById('score-disp');
-const comboDisp=document.getElementById('combo-disp');
-const bestDisp=document.getElementById('best-disp');
-const missesDisp=document.getElementById('misses-disp');
-const timerBar=document.getElementById('timer-bar');
-const comboBar=document.getElementById('combo-bar');
-const arena=document.getElementById('target-area');
-const screen=document.getElementById('screen');
-
-bestDisp.textContent=leaderboard[0]?.score||0;
-
-function startGame(){
-  playerName=document.getElementById('name-input')?.value.trim()||'You';
-  screen.style.display='none';
-  score=0;combo=1;misses=0;running=true;
-  targets=[];timers=[];
-  arena.innerHTML='';
-  update();
-  scheduleSpawn();
-  startComboDecay();
-}
-
-function scheduleSpawn(){
-  if(!running)return;
-  const delay=Math.max(400,1000-score*1.5);
-  spawnTimer=setTimeout(()=>{
-    spawnTarget();
-    scheduleSpawn();
-  },delay);
-}
-
-function spawnTarget(){
-  if(!running)return;
-  const areaW=arena.offsetWidth,areaH=arena.offsetHeight;
-  const size=Math.max(44,70-score*0.2);
-  const x=Math.random()*(areaW-size);
-  const y=Math.random()*(areaH-size);
-  const life=Math.max(900,2000-score*8);
-  const c=COLORS[Math.floor(Math.random()*COLORS.length)];
-  const el=document.createElement('div');
-  el.className='target';
-  el.style.cssText=`left:${x}px;top:${y}px;width:${size}px;height:${size}px;background:${c.bg};border:2px solid ${c.border};color:${c.text};`;
-  el.dataset.id=Date.now()+Math.random();
-  arena.appendChild(el);
-
-  const barEl=document.createElement('canvas');
-  barEl.width=size;barEl.height=4;
-  barEl.style.cssText=`position:absolute;bottom:0;left:0;border-radius:2px;`;
-  el.appendChild(barEl);
-  const ctx=barEl.getContext('2d');
-  const start=Date.now();
-
-  function drawBar(){
-    const pct=1-(Date.now()-start)/life;
-    ctx.clearRect(0,0,size,4);
-    ctx.fillStyle=c.border;
-    ctx.beginPath();ctx.roundRect(0,0,size*pct,4,2);ctx.fill();
-  }
-
-  const animId=setInterval(drawBar,30);
-
-  el.addEventListener('pointerdown',e=>{e.stopPropagation();hitTarget(el,x+size/2,y+size/2,c,animId);},true);
-
-  const t=setTimeout(()=>{
-    if(el.parentNode){
-      el.classList.add('miss-anim');
-      setTimeout(()=>el.remove(),220);
-      clearInterval(animId);
-      registerMiss();
-    }
-  },life);
-  timers.push({id:el.dataset.id,timer:t,animId});
-}
-
-function hitTarget(el,cx,cy,c,animId){
-  if(!running||!el.parentNode)return;
-  clearInterval(animId);
-  const t=timers.find(t=>t.id===el.dataset.id);
-  if(t){clearTimeout(t.timer);}
-  el.classList.add('pop');
-  setTimeout(()=>el.remove(),180);
-
-  score+=10*combo;
-  combo=Math.min(combo+1,8);
-  comboBar.style.width='100%';
-  resetComboDecay();
-  spawnRipple(cx,cy,c);
-  if(combo>1)spawnComboText(cx,cy,combo,c);
-  update();
-}
-
-function registerMiss(){
-  misses++;
-  combo=1;
-  comboBar.style.width='0%';
-  update();
-  if(misses>=3)endGame();
-}
-
-function spawnRipple(x,y,c){
-  const r=document.createElement('div');
-  r.className='ripple';
-  r.style.cssText=`left:${x-30}px;top:${y-30}px;width:60px;height:60px;border:2px solid ${c.border};background:${c.bg};`;
-  arena.appendChild(r);
-  setTimeout(()=>r.remove(),400);
-}
-
-function spawnComboText(x,y,combo,c){
-  const t=document.createElement('div');
-  t.className='combo-text';
-  t.textContent=`x${combo}`;
-  t.style.cssText=`left:${x-15}px;top:${y-30}px;color:${c.border};`;
-  arena.appendChild(t);
-  setTimeout(()=>t.remove(),700);
-}
-
-function startComboDecay(){
-  comboDecay=setInterval(()=>{
-    if(!running)return;
-    const w=parseFloat(comboBar.style.width)||0;
-    const newW=w-2.5;
-    if(newW<=0){combo=1;comboBar.style.width='0%';comboDisp.textContent='x1';}
-    else comboBar.style.width=newW+'%';
-  },60);
-}
-
-function resetComboDecay(){
-  comboBar.style.width='100%';
-}
-
-function update(){
-  scoreDisp.textContent=score;
-  comboDisp.textContent='x'+combo;
-  missesDisp.textContent=misses+'/3';
-  if(score>best){best=score;bestDisp.textContent=best;}
-}
-
-function endGame(){
-  running=false;
-  clearTimeout(spawnTimer);
-  clearInterval(comboDecay);
-  timers.forEach(t=>{clearTimeout(t.timer);clearInterval(t.animId);});
-  arena.querySelectorAll('.target').forEach(el=>el.remove());
-
-  if(playerName){
-    leaderboard.push({name:playerName,score});
-    leaderboard.sort((a,b)=>b.score-a.score);
-    leaderboard.splice(5);
-    localStorage.setItem('tf_lb',JSON.stringify(leaderboard));
-  }
-
-  const myRank=leaderboard.findIndex(e=>e.name===playerName&&e.score===score)+1;
-
-  screen.innerHTML=`
-    <h2>Game Over</h2>
-    <div style="display:flex;flex-direction:column;gap:6px;width:100%;max-width:260px;">
-      <div class="score-row"><span>Your score</span><span>${score}</span></div>
-      <div class="score-row"><span>Best ever</span><span>${leaderboard[0]?.score||score}</span></div>
-      <div class="score-row"><span>Your rank</span><span>#${myRank||'—'}</span></div>
-    </div>
-    <div id="leaderboard">
-      <div class="lb-row" style="background:var(--color-background-secondary);font-weight:500;font-size:12px;color:var(--color-text-secondary);">
-        <span class="lb-rank">#</span><span class="lb-name">Player</span><span class="lb-score">Score</span>
-      </div>
-      ${leaderboard.map((e,i)=>`<div class="lb-row${e.name===playerName&&e.score===score?' me':''}"><span class="lb-rank">${i+1}</span><span class="lb-name">${e.name}</span><span class="lb-score">${e.score}</span></div>`).join('')}
-    </div>
-    <button onclick="restartGame()">Play Again</button>
-  `;
-  screen.style.display='flex';
-}
-
-function restartGame(){
-  screen.innerHTML=`
-    <h2>Tap Frenzy</h2>
-    <p>Tap circles before they vanish. Miss 3 and it's over. Chain hits for combos!</p>
-    <input id="name-input" type="text" placeholder="Your name (optional)" maxlength="16" autocomplete="off" value="${playerName}" />
-    <button onclick="startGame()">Tap to Start</button>
-  `;
-  screen.style.display='flex';
-}
-</script>
+    <script src="script.js"></script>
 </body>
 </html>
