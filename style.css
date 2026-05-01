@@ -249,6 +249,30 @@ body {
     flex-direction: column;
     align-items: center;
     text-align: center;
+    padding: 40px 20px;
+    border: 1px solid rgba(0, 242, 255, 0.1);
+    background: rgba(20, 20, 25, 0.4);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+}
+
+.screen::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-primary), transparent);
+    animation: scanning 3s linear infinite;
+}
+
+@keyframes scanning {
+    0% { top: 0; opacity: 0; }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% { top: 100%; opacity: 0; }
 }
 
 .hidden {
@@ -256,12 +280,13 @@ body {
 }
 
 h1 {
-    font-size: 48px;
+    font-size: 64px;
     font-weight: 900;
     letter-spacing: -2px;
     color: var(--color-primary);
     text-shadow: var(--shadow-primary);
-    margin-bottom: 0;
+    margin-bottom: 5px;
+    line-height: 1;
 }
 
 .subtitle {
@@ -306,22 +331,32 @@ h1 {
 }
 
 input#player-name {
-    width: 120px;
+    width: 100%;
+    max-width: 280px;
     background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    padding: 12px;
+    border: 2px solid rgba(0, 242, 255, 0.2);
+    border-radius: 12px;
+    padding: 16px;
     color: white;
     font-family: var(--font-main);
-    font-size: 20px;
+    font-size: 18px;
     font-weight: 800;
     text-align: center;
     outline: none;
-    transition: border-color var(--transition-fast);
+    transition: all var(--transition-fast);
+    letter-spacing: 2px;
+}
+
+input#player-name::placeholder {
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 14px;
+    letter-spacing: 4px;
 }
 
 input#player-name:focus {
     border-color: var(--color-primary);
+    background: rgba(0, 242, 255, 0.1);
+    box-shadow: var(--shadow-primary);
 }
 
 .primary-btn {
